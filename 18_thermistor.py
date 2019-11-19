@@ -21,8 +21,8 @@ def loop():
 	Rt = 10000 * Vr / (5 - Vr)
 	temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
 	temp = temp - 273.15
-	print ( temp)
-
+	print ('temperature', temp)
+        print ('voltage',Vr)
 
 if __name__ == '__main__':
 	try:
