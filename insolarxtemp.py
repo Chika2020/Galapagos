@@ -39,7 +39,7 @@ def insolar():
         Vr = 5 * float(analogVal) / 255 # Should be 5V -Yeray
 
         Area = 50.8* 50.8 / (100*100)
-        Power = pow(Vr, 2) /465
+        Power = pow(Vr, 2) /.005
         Radiation = Power / Area
         print("solar cell voltage",Vr)
         print ("Insolation", Radiation)
