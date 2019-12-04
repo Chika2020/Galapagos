@@ -10,6 +10,10 @@ import csv
 import pandas as pd
 from emailCSV import sendEmail
 
+# EmonPi Data imports
+from request import getEmonpiData
+import json
+
 DO = 17
 GPIO.setmode(GPIO.BCM)
 def setup():
@@ -35,14 +39,17 @@ timestampy = myDateObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
 
 setup()
 temp = func()
+voltPower = getEmonpiData()
+volt = voltPower[0]
+power = voltPower[1]
 
 db = MySQLdb.connect("localhost", "admin", "password", "temps")
 curs = db.cursor()
 
-sql = """INSERT INTO demotable (DateNTime,tempDat, otherVal, anotherVal, oneVal)
+sql = """INSERT INTO demotable (DateNTime,tempData, CTData, voltageData, powerData)
 	 VALUES (%s, %s, %s, %s, %s)"""
 #  ('dateY',  otherVal, anotherVal, oneVal)"""
-val = (timestampy, temp, temp, temp, temp)
+val = (timestampy, temp, temp, volt, power)
 
 curs.execute(sql,val) #removed val
 db.commit()
