@@ -73,7 +73,4 @@ def ctFunc():
 	avgVal = 72
 	scalingNum = 2.048/avgVal
 	finalVal = scalingNum * 23
-	print(finalVal)
 	return finalVal
-
-callItpls = ctFunc()
