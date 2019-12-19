@@ -5,7 +5,7 @@ import PCF8591 as ADC
 import RPi.GPIO as GPIO
 import math
 
-# database scrap imports
+# database scrape imports
 import csv
 import pandas as pd
 from emailCSV import sendEmail
@@ -13,6 +13,12 @@ from emailCSV import sendEmail
 # EmonPi Data imports
 from request import getEmonpiData
 import json
+
+# insolation imports
+from insolarxtemp import insolar
+
+# CT imports
+from ctTryAgain import ctFunc
 
 DO = 17
 GPIO.setmode(GPIO.BCM)
@@ -38,27 +44,31 @@ timestampy = myDateObj.strftime("%d-%b-%Y (%H:%M:%S.%f)")
 
 
 setup()
-temp = func()
-voltPower = getEmonpiData()
-volt = voltPower[0]
-power = voltPower[1]
+temp = func() # temp function call
+voltPower = getEmonpiData() # emonpi function call
+insolData = insolar() # insolation function call
+ctData = ctFunc() # CT function call
+print(ctData)
+
+voltData = voltPower[0]
+powData = voltPower[1]
 
 db = MySQLdb.connect("localhost", "admin", "password", "temps")
 curs = db.cursor()
 
-sql = """INSERT INTO demotable (DateNTime,tempData, CTData, voltageData, powerData)
-	 VALUES (%s, %s, %s, %s, %s)"""
-#  ('dateY',  otherVal, anotherVal, oneVal)"""
-val = (timestampy, temp, temp, volt, power)
+sql = """INSERT INTO demotable (DateNTime,tempData, voltageData, powerData, insolationData, ctData)
+	 VALUES (%s, %s, %s, %s, %s, %s)"""
 
-curs.execute(sql,val) #removed val
+val = (timestampy, temp, voltData, powData, insolData, ctData) #replace second insol with CT
+
+curs.execute(sql,val)
 db.commit()
 
 def DBscrape(query):
 	df = pd.read_sql(query, con=db)
-	df.to_csv("Output.csv",index=False)
+	df.to_csv("WeeklyReport.csv",index=False)
 
-	sendEmail("Output.csv")
+	sendEmail("WeeklyReport.csv")
 	curs.execute(query)
 	row = curs.fetchone()
 	db.close()
